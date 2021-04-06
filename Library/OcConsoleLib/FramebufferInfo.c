@@ -95,9 +95,21 @@ OcAppleFbInfoInstallProtocol (
 {
   EFI_STATUS                      Status;
   APPLE_FRAMEBUFFER_INFO_PROTOCOL *Protocol;
+  EFI_GRAPHICS_OUTPUT_PROTOCOL    *GraphicsOutput;
   EFI_HANDLE                      NewHandle;
 
   DEBUG ((DEBUG_VERBOSE, "OcAppleFbInfoInstallProtocol\n"));
+
+  Status = gBS->LocateProtocol (
+    &gEfiGraphicsOutputProtocolGuid,
+    NULL,
+    (VOID *) &GraphicsOutput
+    );
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_INFO, "OCOS: No GOP protocols for FB info, ignoring\n"));
+    return NULL;
+  }
 
   if (Reinstall) {
     Status = OcUninstallAllProtocolInstances (&gAppleFramebufferInfoProtocolGuid);

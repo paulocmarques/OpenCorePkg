@@ -16,6 +16,7 @@
 #include "ocvalidate.h"
 #include "OcValidateLib.h"
 
+#include <Library/BaseLib.h>
 #include <Library/OcConsoleLib.h>
 
 /**
@@ -137,6 +138,54 @@ CheckUEFIAPFS (
     && (ScanPolicy & OC_SCAN_ALLOW_FS_APFS) == 0) {
     DEBUG ((DEBUG_WARN, "UEFI->APFS->EnableJumpstart is enabled, but Misc->Security->ScanPolicy does not allow APFS scanning!\n"));
     ++ErrorCount;
+  }
+
+  return ErrorCount;
+}
+
+STATIC
+UINT32
+CheckUEFIAppleInput (
+  IN  OC_GLOBAL_CONFIG  *Config
+  )
+{
+  UINT32          ErrorCount;
+  OC_UEFI_CONFIG  *UserUefi;
+  CONST CHAR8     *AppleEvent;
+  CONST CHAR8     *CustomDelays;
+
+  ErrorCount      = 0;
+  UserUefi        = &Config->Uefi;
+
+  ErrorCount      = 0;
+
+  AppleEvent = OC_BLOB_GET (&UserUefi->AppleInput.AppleEvent);
+  if (AsciiStrCmp (AppleEvent, "Auto") != 0
+    && AsciiStrCmp (AppleEvent, "Builtin") != 0
+    && AsciiStrCmp (AppleEvent, "OEM") != 0) {
+    DEBUG ((DEBUG_WARN, "UEFI->AppleInput->AppleEvent is illegal (Can only be Auto, Builtin, OEM)!\n"));
+    ++ErrorCount;
+  }
+
+  CustomDelays = OC_BLOB_GET (&UserUefi->AppleInput.CustomDelays);
+  if (AsciiStrCmp (CustomDelays, "Auto") != 0
+    && AsciiStrCmp (CustomDelays, "Enabled") != 0
+    && AsciiStrCmp (CustomDelays, "Disabled") != 0) {
+    DEBUG ((DEBUG_WARN, "UEFI->AppleInput->CustomDelays is illegal (Can only be Auto, Enabled, Disabled)!\n"));
+    ++ErrorCount;
+  }
+
+  if (UserUefi->Input.KeySupport
+    && AsciiStrCmp (CustomDelays, "Disabled") != 0) {
+    if (UserUefi->AppleInput.KeyInitialDelay != 0
+      && UserUefi->AppleInput.KeyInitialDelay < UserUefi->Input.KeyForgetThreshold) {
+      DEBUG ((DEBUG_WARN, "KeyInitialDelay is enabled in KeySupport mode, is non-zero and is less than the KeyForgetThreshold value (likely to result in uncontrolled key repeats); use zero (0) instead!\n"));
+      ++ErrorCount;
+    }
+    if (UserUefi->AppleInput.KeySubsequentDelay < UserUefi->Input.KeyForgetThreshold) {
+      DEBUG ((DEBUG_WARN, "KeySubsequentDelay is enabled in KeySupport mode and is less than the KeyForgetThreshold value (likely to result in uncontrolled key repeats); use the KeyForgetThreshold value, or greater, instead!\n"));
+      ++ErrorCount;
+    }
   }
 
   return ErrorCount;
@@ -532,6 +581,7 @@ CheckUEFI (
   UINTN                Index;
   STATIC CONFIG_CHECK  UEFICheckers[] = {
     &CheckUEFIAPFS,
+    &CheckUEFIAppleInput,
     &CheckUEFIAudio,
     &CheckUEFIDrivers,
     &CheckUEFIInput,
@@ -543,7 +593,7 @@ CheckUEFI (
   DEBUG ((DEBUG_VERBOSE, "config loaded into %a!\n", __func__));
 
   ErrorCount = 0;
-  
+
   for (Index = 0; Index < ARRAY_SIZE (UEFICheckers); ++Index) {
     ErrorCount += UEFICheckers[Index] (Config);
   }

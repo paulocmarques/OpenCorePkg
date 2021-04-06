@@ -9,12 +9,16 @@
 #include <Uefi.h>
 #include <Library/UefiLib.h>
 #include <Library/UefiApplicationEntryPoint.h>
+#include <stdlib.h>
 
 #ifdef SANITIZE_TEST
 #include <sanitizer/asan_interface.h>
+#define ASAN_CHECK_MEMORY_REGION(addr, size) \
+  do { if (__asan_region_is_poisoned((addr), (size)) != NULL) { abort(); } } while (0)
 #else
 #define ASAN_POISON_MEMORY_REGION(addr, size) do { } while (0)
 #define ASAN_UNPOISON_MEMORY_REGION(addr, size) do { } while (0)
+#define ASAN_CHECK_MEMORY_REGION(addr, size) do { } while (0)
 #endif
 
 extern EFI_GUID     gAppleBootVariableGuid;
@@ -29,7 +33,10 @@ extern EFI_GUID     gAppleBlessedSystemFolderInfoGuid;
 extern EFI_GUID     gAppleBootPolicyProtocolGuid;
 extern EFI_GUID     gAppleVendorVariableGuid;
 extern EFI_GUID     gAppleImg4VerificationProtocolGuid;
-extern EFI_GUID     gAppleBeepGenProtocolGuid; 
+extern EFI_GUID     gAppleBeepGenProtocolGuid;
+extern EFI_GUID     gApplePlatformInfoDatabaseProtocolGuid;
+extern EFI_GUID     gAppleFsbFrequencyPlatformInfoGuid;
+extern EFI_GUID     gAppleFsbFrequencyPlatformInfoIndexHobGuid;
 
 extern CONST CHAR8  *gEfiCallerBaseName;
 extern EFI_GUID     gEfiGraphicsOutputProtocolGuid;

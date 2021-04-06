@@ -31,7 +31,7 @@ Kexts
 | [GK701HIDDevice.kext](https://github.com/osy86/GK701HIDDevice) | — | — |
 | [NoTouchID.kext](https://github.com/al3xtjames/NoTouchID) | 17.0.0 (10.13) | — |
 | [SerialMouse.kext](https://github.com/Goldfish64/SerialMouse) | — | — |
-| [VoodooI2C.kext](https://github.com/alexandred/VoodooI2C) | 16.0.0 (10.12) | — |
+| [VoodooI2C.kext](https://github.com/VoodooI2C/VoodooI2C) | 16.0.0 (10.12) | — |
 | [VoodooPS2Controller.kext](https://github.com/acidanthera/VoodooPS2) | 15.0.0 (10.11) | — |
 | [VoodooPS2Keyboard.kext](https://github.com/acidanthera/VoodooPS2) | 15.0.0 (10.11) | — |
 | [VoodooPS2Mouse.kext](https://github.com/acidanthera/VoodooPS2) | 15.0.0 (10.11) | — |
@@ -65,7 +65,8 @@ Kexts
 | [TSCAdjustReset.kext](https://github.com/interferenc/TSCAdjustReset) | — | — |
 | [VoodooTSCSync.kext](https://github.com/RehabMan/VoodooTSCSync) | — | — |
 | [CpuTscSync.kext](https://github.com/acidanthera/CpuTscSync) | 12.0.0 (10.8) | — |
-| [FakeSMC.kext](https://github.com/CloverHackyColor/FakeSMC3_with_plugins) | — | — |
+| [FakeSMC.kext](https://github.com/CloverHackyColor/FakeSMC3_with_plugins) | 10.0.0 (10.6) | — |
+| [FakeSMC-32.kext](https://github.com/khronokernel/Legacy-Kexts/blob/master/32Bit-only/Zip/FakeSMC-32.kext.zip?raw=true) | 8.0.0 (10.4) | 11.9.9 (10.7) |
 | [VirtualSMC.kext](https://github.com/acidanthera/VirtualSMC) | 10.0.0 (10.6) | — |
 | [SMCLightSensor.kext](https://github.com/acidanthera/VirtualSMC) | 10.0.0 (10.6) Not tested | — |
 | [SMCSuperIO.kext](https://github.com/acidanthera/VirtualSMC) | 10.0.0 (10.6) Not tested | — |

@@ -53,6 +53,10 @@ OC_CPU_INFO
 mOpenCoreCpuInfo;
 
 STATIC
+UINT8
+mOpenCoreBooterHash[SHA1_DIGEST_SIZE];
+
+STATIC
 OC_RSA_PUBLIC_KEY *
 mOpenCoreVaultKey;
 
@@ -131,9 +135,16 @@ OcMain (
   DEBUG ((DEBUG_INFO, "OC: OcLoadNvramSupport...\n"));
   OcLoadNvramSupport (Storage, &mOpenCoreConfiguration);
   DEBUG ((DEBUG_INFO, "OC: OcMiscMiddleInit...\n"));
-  OcMiscMiddleInit (Storage, &mOpenCoreConfiguration, mStorageRoot, LoadPath, mStorageHandle);
+  OcMiscMiddleInit (
+    Storage,
+    &mOpenCoreConfiguration,
+    mStorageRoot,
+    LoadPath,
+    mStorageHandle,
+    mOpenCoreConfiguration.Booter.Quirks.ForceBooterSignature ? mOpenCoreBooterHash : NULL
+    );
   DEBUG ((DEBUG_INFO, "OC: OcLoadUefiSupport...\n"));
-  OcLoadUefiSupport (Storage, &mOpenCoreConfiguration, &mOpenCoreCpuInfo);
+  OcLoadUefiSupport (Storage, &mOpenCoreConfiguration, &mOpenCoreCpuInfo, mOpenCoreBooterHash);
   DEBUG_CODE_BEGIN ();
   DEBUG ((DEBUG_INFO, "OC: OcMiscLoadSystemReport...\n"));
   OcMiscLoadSystemReport (&mOpenCoreConfiguration, mStorageHandle);
@@ -304,6 +315,13 @@ UefiMain (
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "OC: Failed to locate loaded image - %r\n", Status));
     return EFI_NOT_FOUND;
+  }
+
+  if (LoadedImage->DeviceHandle == NULL) {
+    DEBUG ((DEBUG_INFO, "OC: Missing boot device\n"));
+    //
+    // This is not critical as boot path may be complete.
+    //
   }
 
   if (LoadedImage->FilePath == NULL) {

@@ -73,6 +73,7 @@ OC_STRUCTORS       (OC_PLATFORM_CONFIG, ())
 
 OC_ARRAY_STRUCTORS (OC_UEFI_DRIVER_ARRAY)
 OC_STRUCTORS       (OC_UEFI_APFS, ())
+OC_STRUCTORS       (OC_UEFI_APPLEINPUT, ())
 OC_STRUCTORS       (OC_UEFI_AUDIO, ())
 OC_STRUCTORS       (OC_UEFI_INPUT, ())
 OC_STRUCTORS       (OC_UEFI_OUTPUT, ())
@@ -118,6 +119,8 @@ mAcpiDeleteSchema = OC_SCHEMA_DICT (NULL, mAcpiDeleteSchemaEntry);
 STATIC
 OC_SCHEMA
 mAcpiPatchSchemaEntry[] = {
+  OC_SCHEMA_STRING_IN    ("Base",           OC_ACPI_PATCH_ENTRY, Base),
+  OC_SCHEMA_INTEGER_IN   ("BaseSkip",       OC_ACPI_PATCH_ENTRY, BaseSkip),
   OC_SCHEMA_STRING_IN    ("Comment",        OC_ACPI_PATCH_ENTRY, Comment),
   OC_SCHEMA_INTEGER_IN   ("Count",          OC_ACPI_PATCH_ENTRY, Count),
   OC_SCHEMA_BOOLEAN_IN   ("Enabled",        OC_ACPI_PATCH_ENTRY, Enabled),
@@ -182,6 +185,7 @@ mBooterQuirksSchema[] = {
   OC_SCHEMA_BOOLEAN_IN ("DiscardHibernateMap",    OC_GLOBAL_CONFIG, Booter.Quirks.DiscardHibernateMap),
   OC_SCHEMA_BOOLEAN_IN ("EnableSafeModeSlide",    OC_GLOBAL_CONFIG, Booter.Quirks.EnableSafeModeSlide),
   OC_SCHEMA_BOOLEAN_IN ("EnableWriteUnprotector", OC_GLOBAL_CONFIG, Booter.Quirks.EnableWriteUnprotector),
+  OC_SCHEMA_BOOLEAN_IN ("ForceBooterSignature",   OC_GLOBAL_CONFIG, Booter.Quirks.ForceBooterSignature),
   OC_SCHEMA_BOOLEAN_IN ("ForceExitBootServices",  OC_GLOBAL_CONFIG, Booter.Quirks.ForceExitBootServices),
   OC_SCHEMA_BOOLEAN_IN ("ProtectMemoryRegions",   OC_GLOBAL_CONFIG, Booter.Quirks.ProtectMemoryRegions),
   OC_SCHEMA_BOOLEAN_IN ("ProtectSecureBoot",      OC_GLOBAL_CONFIG, Booter.Quirks.ProtectSecureBoot),
@@ -552,7 +556,7 @@ mPlatformConfigurationGenericSchema[] = {
   OC_SCHEMA_STRING_IN  ("MLB",                OC_GLOBAL_CONFIG, PlatformInfo.Generic.Mlb),
   OC_SCHEMA_BOOLEAN_IN ("MaxBIOSVersion",     OC_GLOBAL_CONFIG, PlatformInfo.Generic.MaxBIOSVersion),
   OC_SCHEMA_INTEGER_IN ("ProcessorType",      OC_GLOBAL_CONFIG, PlatformInfo.Generic.ProcessorType),
-  OC_SCHEMA_DATAF_IN   ("ROM",                OC_GLOBAL_CONFIG, PlatformInfo.Generic.Rom),
+  OC_SCHEMA_MDATAF_IN  ("ROM",                OC_GLOBAL_CONFIG, PlatformInfo.Generic.Rom),
   OC_SCHEMA_BOOLEAN_IN ("SpoofVendor",        OC_GLOBAL_CONFIG, PlatformInfo.Generic.SpoofVendor),
   OC_SCHEMA_STRING_IN  ("SystemMemoryStatus", OC_GLOBAL_CONFIG, PlatformInfo.Generic.SystemMemoryStatus),
   OC_SCHEMA_STRING_IN  ("SystemProductName",  OC_GLOBAL_CONFIG, PlatformInfo.Generic.SystemProductName),
@@ -598,6 +602,7 @@ mPlatformConfigurationNvramSchema[] = {
   OC_SCHEMA_DATAF_IN  ("FirmwareFeaturesMask", OC_GLOBAL_CONFIG, PlatformInfo.Nvram.FirmwareFeaturesMask),
   OC_SCHEMA_STRING_IN ("MLB",                  OC_GLOBAL_CONFIG, PlatformInfo.Nvram.Mlb),
   OC_SCHEMA_DATAF_IN  ("ROM",                  OC_GLOBAL_CONFIG, PlatformInfo.Nvram.Rom),
+  OC_SCHEMA_STRING_IN ("SystemSerialNumber",   OC_GLOBAL_CONFIG, PlatformInfo.Nvram.SystemSerialNumber),
   OC_SCHEMA_STRING_IN ("SystemUUID",           OC_GLOBAL_CONFIG, PlatformInfo.Nvram.SystemUuid),
 };
 
@@ -661,6 +666,7 @@ mUefiDriversSchema = OC_SCHEMA_STRING (NULL);
 STATIC
 OC_SCHEMA
 mUefiQuirksSchema[] = {
+  OC_SCHEMA_BOOLEAN_IN ("ActivateHpetSupport",    OC_GLOBAL_CONFIG, Uefi.Quirks.ActivateHpetSupport),
   OC_SCHEMA_BOOLEAN_IN ("DisableSecurityPolicy",  OC_GLOBAL_CONFIG, Uefi.Quirks.DisableSecurityPolicy),
   OC_SCHEMA_INTEGER_IN ("ExitBootServicesDelay",  OC_GLOBAL_CONFIG, Uefi.Quirks.ExitBootServicesDelay),
   OC_SCHEMA_BOOLEAN_IN ("IgnoreInvalidFlexRatio", OC_GLOBAL_CONFIG, Uefi.Quirks.IgnoreInvalidFlexRatio),
@@ -676,7 +682,6 @@ mUefiProtocolOverridesSchema[] = {
   OC_SCHEMA_BOOLEAN_IN ("AppleAudio",              OC_GLOBAL_CONFIG, Uefi.ProtocolOverrides.AppleAudio),
   OC_SCHEMA_BOOLEAN_IN ("AppleBootPolicy",         OC_GLOBAL_CONFIG, Uefi.ProtocolOverrides.AppleBootPolicy),
   OC_SCHEMA_BOOLEAN_IN ("AppleDebugLog",           OC_GLOBAL_CONFIG, Uefi.ProtocolOverrides.AppleDebugLog),
-  OC_SCHEMA_BOOLEAN_IN ("AppleEvent",              OC_GLOBAL_CONFIG, Uefi.ProtocolOverrides.AppleEvent),
   OC_SCHEMA_BOOLEAN_IN ("AppleFramebufferInfo",    OC_GLOBAL_CONFIG, Uefi.ProtocolOverrides.AppleFramebufferInfo),
   OC_SCHEMA_BOOLEAN_IN ("AppleImageConversion",    OC_GLOBAL_CONFIG, Uefi.ProtocolOverrides.AppleImageConversion),
   OC_SCHEMA_BOOLEAN_IN ("AppleImg4Verification",   OC_GLOBAL_CONFIG, Uefi.ProtocolOverrides.AppleImg4Verification),
@@ -706,6 +711,17 @@ mUefiApfsSchema[] = {
 
 STATIC
 OC_SCHEMA
+mUefiAppleInputSchema[] = {
+  OC_SCHEMA_STRING_IN   ("AppleEvent",              OC_GLOBAL_CONFIG,  Uefi.AppleInput.AppleEvent),
+  OC_SCHEMA_STRING_IN   ("CustomDelays",            OC_GLOBAL_CONFIG,  Uefi.AppleInput.CustomDelays),
+  OC_SCHEMA_INTEGER_IN  ("KeyInitialDelay",         OC_GLOBAL_CONFIG,  Uefi.AppleInput.KeyInitialDelay),
+  OC_SCHEMA_INTEGER_IN  ("KeySubsequentDelay",      OC_GLOBAL_CONFIG,  Uefi.AppleInput.KeySubsequentDelay),
+  OC_SCHEMA_INTEGER_IN  ("PointerSpeedDiv",         OC_GLOBAL_CONFIG,  Uefi.AppleInput.PointerSpeedDiv),
+  OC_SCHEMA_INTEGER_IN  ("PointerSpeedMul",         OC_GLOBAL_CONFIG,  Uefi.AppleInput.PointerSpeedMul),
+};
+
+STATIC
+OC_SCHEMA
 mUefiAudioSchema[] = {
   OC_SCHEMA_INTEGER_IN ("AudioCodec",         OC_GLOBAL_CONFIG, Uefi.Audio.AudioCodec),
   OC_SCHEMA_STRING_IN  ("AudioDevice",        OC_GLOBAL_CONFIG, Uefi.Audio.AudioDevice),
@@ -713,6 +729,7 @@ mUefiAudioSchema[] = {
   OC_SCHEMA_BOOLEAN_IN ("AudioSupport",       OC_GLOBAL_CONFIG, Uefi.Audio.AudioSupport),
   OC_SCHEMA_INTEGER_IN ("MinimumVolume",      OC_GLOBAL_CONFIG, Uefi.Audio.MinimumVolume),
   OC_SCHEMA_STRING_IN  ("PlayChime",          OC_GLOBAL_CONFIG, Uefi.Audio.PlayChime),
+  OC_SCHEMA_BOOLEAN_IN ("ResetTrafficClass",  OC_GLOBAL_CONFIG, Uefi.Audio.ResetTrafficClass),
   OC_SCHEMA_INTEGER_IN ("SetupDelay",         OC_GLOBAL_CONFIG, Uefi.Audio.SetupDelay),
   OC_SCHEMA_INTEGER_IN ("VolumeAmplifier",    OC_GLOBAL_CONFIG, Uefi.Audio.VolumeAmplifier),
 };
@@ -722,7 +739,6 @@ OC_SCHEMA
 mUefiInputSchema[] = {
   OC_SCHEMA_BOOLEAN_IN ("KeyFiltering",       OC_GLOBAL_CONFIG, Uefi.Input.KeyFiltering),
   OC_SCHEMA_INTEGER_IN ("KeyForgetThreshold", OC_GLOBAL_CONFIG, Uefi.Input.KeyForgetThreshold),
-  OC_SCHEMA_INTEGER_IN ("KeyMergeThreshold",  OC_GLOBAL_CONFIG, Uefi.Input.KeyMergeThreshold),
   OC_SCHEMA_BOOLEAN_IN ("KeySupport",         OC_GLOBAL_CONFIG, Uefi.Input.KeySupport),
   OC_SCHEMA_STRING_IN  ("KeySupportMode",     OC_GLOBAL_CONFIG, Uefi.Input.KeySupportMode),
   OC_SCHEMA_BOOLEAN_IN ("KeySwap",            OC_GLOBAL_CONFIG, Uefi.Input.KeySwap),
@@ -738,6 +754,7 @@ mUefiOutputSchema[] = {
   OC_SCHEMA_STRING_IN  ("ConsoleMode",            OC_GLOBAL_CONFIG, Uefi.Output.ConsoleMode),
   OC_SCHEMA_BOOLEAN_IN ("DirectGopRendering",     OC_GLOBAL_CONFIG, Uefi.Output.DirectGopRendering),
   OC_SCHEMA_BOOLEAN_IN ("ForceResolution",        OC_GLOBAL_CONFIG, Uefi.Output.ForceResolution),
+  OC_SCHEMA_BOOLEAN_IN ("GopPassThrough",         OC_GLOBAL_CONFIG, Uefi.Output.GopPassThrough),
   OC_SCHEMA_BOOLEAN_IN ("IgnoreTextInGraphics",   OC_GLOBAL_CONFIG, Uefi.Output.IgnoreTextInGraphics),
   OC_SCHEMA_BOOLEAN_IN ("ProvideConsoleGop",      OC_GLOBAL_CONFIG, Uefi.Output.ProvideConsoleGop),
   OC_SCHEMA_BOOLEAN_IN ("ReconnectOnResChange",   OC_GLOBAL_CONFIG, Uefi.Output.ReconnectOnResChange),
@@ -766,6 +783,7 @@ STATIC
 OC_SCHEMA
 mUefiConfigurationSchema[] = {
   OC_SCHEMA_DICT       ("APFS",              mUefiApfsSchema),
+  OC_SCHEMA_DICT       ("AppleInput",        mUefiAppleInputSchema),
   OC_SCHEMA_DICT       ("Audio",             mUefiAudioSchema),
   OC_SCHEMA_BOOLEAN_IN ("ConnectDrivers",    OC_GLOBAL_CONFIG, Uefi.ConnectDrivers),
   OC_SCHEMA_ARRAY_IN   ("Drivers",           OC_GLOBAL_CONFIG, Uefi.Drivers, &mUefiDriversSchema),

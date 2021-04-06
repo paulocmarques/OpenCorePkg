@@ -51,35 +51,35 @@ InternalSectionIsSane (
 
   TopOfSegment = (Segment->VirtualAddress + Segment->Size);
   Result       = MACH_X (OcOverflowAddU) (
-                   Section->Address,
-                   Section->Size,
-                   &TopOfSection
-                   );
+    Section->Address,
+    Section->Size,
+    &TopOfSection
+    );
   if (Result || (TopOfSection > TopOfSegment)) {
     return FALSE;
   }
 
   Result   = MACH_X (OcOverflowAddU) (
-                Section->Offset,
-                Section->Size,
-                &TopOffsetX
-                );
+    Section->Offset,
+    Section->Size,
+    &TopOffsetX
+    );
   if (Result || (TopOffsetX > (Segment->FileOffset + Segment->FileSize))) {
     return FALSE;
   }
 
   if (Section->NumRelocations != 0) {
     Result = OcOverflowSubU32 (
-                Section->RelocationsOffset,
-                Context->ContainerOffset,
-                &TopOffset32
-                );
+      Section->RelocationsOffset,
+      Context->ContainerOffset,
+      &TopOffset32
+      );
     Result |= OcOverflowMulAddU32 (
-               Section->NumRelocations,
-               sizeof (MACH_RELOCATION_INFO),
-               TopOffset32,
-               &TopOffset32
-               );
+      Section->NumRelocations,
+      sizeof (MACH_RELOCATION_INFO),
+      TopOffset32,
+      &TopOffset32
+      );
     if (Result || (TopOffset32 > Context->FileSize)) {
       return FALSE;
     }
@@ -126,15 +126,6 @@ InternalStripLoadCommands (
   OriginalCommandSize = SizeOfLeftCommands;
 
   for (Index = 0; Index < MachHeader->NumCommands; ++Index) {
-    //
-    // Assertion: LC_UNIXTHREAD and LC_MAIN are technically stripped in KXLD,
-    //            but they are not supposed to be present in the first place.
-    //
-    if ((LoadCommand->CommandType == MACH_LOAD_COMMAND_UNIX_THREAD)
-     || (LoadCommand->CommandType == MACH_LOAD_COMMAND_MAIN)) {
-      DEBUG ((DEBUG_WARN, "OCMCO: UNIX Thread and Main LCs are unsupported\n"));
-    }
-
     SizeOfLeftCommands -= LoadCommand->CommandSize;
 
     for (Index2 = 0; Index2 < ARRAY_SIZE (LoadCommandsToStrip); ++Index2) {
@@ -264,7 +255,7 @@ MACH_X (InternalMachoGetFilePointerByAddress) (
       }
 
       Offset += Segment->FileOffset - Context->ContainerOffset;
-      return (VOID *)((UINTN)Context->MachHeader + (UINTN)Offset);
+      return (VOID *) ((UINTN) Context->MachHeader + (UINTN) Offset);
     }
   }
 
@@ -433,8 +424,8 @@ MACH_X (InternalMachoExpandImage) (
 #endif
     if (!CalculateSizeOnly) {
       ZeroMem (&Destination[CopyFileOffset + OriginalDelta], CurrentDelta - OriginalDelta);
-      CopyMem (&Destination[CopyFileOffset + CurrentDelta], &Source[CopyFileOffset], (UINTN)CopyFileSize);
-      ZeroMem (&Destination[CopyFileOffset + CurrentDelta + CopyFileSize], (UINTN)(CopyVmSize - CopyFileSize));
+      CopyMem (&Destination[CopyFileOffset + CurrentDelta], &Source[CopyFileOffset], (UINTN) CopyFileSize);
+      ZeroMem (&Destination[CopyFileOffset + CurrentDelta + CopyFileSize], (UINTN) (CopyVmSize - CopyFileSize));
     }
   
     //
@@ -474,13 +465,13 @@ MACH_X (InternalMachoExpandImage) (
       FoundLinkedit = TRUE;
 
       if (!CalculateSizeOnly) {
-        Symtab = (MACH_SYMTAB_COMMAND *)(
-                   MachoGetNextCommand (
-                     Context,
-                     MACH_LOAD_COMMAND_SYMTAB,
-                     NULL
-                     )
-                   );
+        Symtab = (MACH_SYMTAB_COMMAND *) (
+          MachoGetNextCommand (
+            Context,
+            MACH_LOAD_COMMAND_SYMTAB,
+            NULL
+            )
+          );
 
         if (Symtab != NULL) {
           Symtab = (MACH_SYMTAB_COMMAND *) ((UINT8 *) Symtab - Source + Destination);
@@ -492,13 +483,13 @@ MACH_X (InternalMachoExpandImage) (
           }
         }
 
-        DySymtab = (MACH_DYSYMTAB_COMMAND *)(
-                      MachoGetNextCommand (
-                        Context,
-                        MACH_LOAD_COMMAND_DYSYMTAB,
-                        NULL
-                        )
-                      );
+        DySymtab = (MACH_DYSYMTAB_COMMAND *) (
+          MachoGetNextCommand (
+            Context,
+            MACH_LOAD_COMMAND_DYSYMTAB,
+            NULL
+            )
+          );
 
         if (DySymtab != NULL) {
           DySymtab = (MACH_DYSYMTAB_COMMAND *) ((UINT8 *) DySymtab - Source + Destination);
@@ -640,13 +631,13 @@ MACH_X (InternalMachoExpandImage) (
     //
     // Copy symbols and string tables.
     //
-    Symtab = (MACH_SYMTAB_COMMAND *)(
-               MachoGetNextCommand (
-                 Context,
-                 MACH_LOAD_COMMAND_SYMTAB,
-                 NULL
-                 )
-               );
+    Symtab = (MACH_SYMTAB_COMMAND *) (
+      MachoGetNextCommand (
+        Context,
+        MACH_LOAD_COMMAND_SYMTAB,
+        NULL
+        )
+      );
     if (Symtab != NULL) {
       SymbolsOffset = Symtab->SymbolsOffset;
       StringsOffset = Symtab->StringsOffset;
@@ -734,7 +725,7 @@ MACH_X (InternalMachoExpandImage) (
     if (!CalculateSizeOnly) {
       CopyMem (
         Destination + HeaderSize,
-        (UINT8 *)Header + HeaderSize,
+        (UINT8 *) Header + HeaderSize,
         FileSize - HeaderSize
         );
     }
@@ -914,10 +905,10 @@ MACH_X (MachoInitializeContext) (
   }
 
   Result = OcOverflowAddUN (
-             (UINTN)MachHeader->Commands,
-             MachHeader->CommandsSize,
-             &TopOfCommands
-             );
+    (UINTN)MachHeader->Commands,
+    MachHeader->CommandsSize,
+    &TopOfCommands
+    );
   if (Result || (TopOfCommands > TopOfFile)) {
     return FALSE;
   }
@@ -930,10 +921,10 @@ MACH_X (MachoInitializeContext) (
     ++Index, Command = NEXT_MACH_LOAD_COMMAND (Command)
     ) {
     Result = OcOverflowAddUN (
-               (UINTN)Command,
-               sizeof (*Command),
-               &TopOfCommand
-               );
+      (UINTN) Command,
+      sizeof (*Command),
+      &TopOfCommand
+      );
     if (Result
      || (TopOfCommand > TopOfCommands)
      || (Command->CommandSize < sizeof (*Command))
@@ -943,10 +934,10 @@ MACH_X (MachoInitializeContext) (
     }
 
     Result = OcOverflowAddU32 (
-               CommandsSize,
-               Command->CommandSize,
-               &CommandsSize
-               );
+      CommandsSize,
+      Command->CommandSize,
+      &CommandsSize
+      );
     if (Result) {
       return FALSE;
     }
@@ -1048,10 +1039,10 @@ MACH_X (MachoGetSegmentByName) (
     Segment = MACH_X (MachoGetNextSegment) (Context, Segment)
     ) {
     Result = AsciiStrnCmp (
-                Segment->SegmentName,
-                SegmentName,
-                ARRAY_SIZE (Segment->SegmentName)
-                );
+      Segment->SegmentName,
+      SegmentName,
+      ARRAY_SIZE (Segment->SegmentName)
+      );
     if (Result == 0) {
       return Segment;
     }
@@ -1087,10 +1078,10 @@ MACH_X (MachoGetSectionByName) (
     // objects.
     //
     Result = AsciiStrnCmp (
-               Section->SectionName,
-               SectionName,
-               ARRAY_SIZE (Section->SectionName)
-               );
+      Section->SectionName,
+      SectionName,
+      ARRAY_SIZE (Section->SectionName)
+      );
     if (Result == 0) {
       return Section;
     }
@@ -1165,25 +1156,25 @@ MACH_X (MachoGetNextSegment) (
   }
 
   Result = OcOverflowMulAddUN (
-             NextSegment->NumSections,
-             sizeof (*NextSegment->Sections),
-             (UINTN) NextSegment->Sections,
-             &TopOfSections
-             );
+    NextSegment->NumSections,
+    sizeof (*NextSegment->Sections),
+    (UINTN) NextSegment->Sections,
+    &TopOfSections
+    );
   if (Result || (((UINTN) NextSegment + NextSegment->CommandSize) < TopOfSections)) {
     return NULL;
   }
 
   Result = MACH_X (OcOverflowSubU) (
-             NextSegment->FileOffset,
-             Context->ContainerOffset,
-             &TopOfSegment
-             );
+    NextSegment->FileOffset,
+    Context->ContainerOffset,
+    &TopOfSegment
+    );
   Result |= MACH_X (OcOverflowAddU) (
-              TopOfSegment,
-              NextSegment->FileSize,
-              &TopOfSegment
-              );
+    TopOfSegment,
+    NextSegment->FileSize,
+    &TopOfSegment
+    );
   if (Result || (TopOfSegment > Context->FileSize)) {
     return NULL;
   }
@@ -1252,10 +1243,10 @@ MACH_X (MachoGetSectionByIndex) (
     Segment = MACH_X (MachoGetNextSegment) (Context, Segment)
     ) {
     Result = OcOverflowAddU32 (
-               SectionIndex,
-               Segment->NumSections,
-               &NextSectionIndex
-               );
+      SectionIndex,
+      Segment->NumSections,
+      &NextSectionIndex
+      );
     //
     // If NextSectionIndex is wrapping around, Index must be contained.
     //
@@ -1313,15 +1304,15 @@ MACH_X (MachoGetSectionByAddress) (
 
 UINT32
 MACH_X (MachoGetSymbolTable) (
-  IN OUT OC_MACHO_CONTEXT     *Context,
-     OUT CONST MACH_NLIST_X   **SymbolTable,
-     OUT CONST CHAR8          **StringTable OPTIONAL,
-     OUT CONST MACH_NLIST_X   **LocalSymbols, OPTIONAL
-     OUT UINT32               *NumLocalSymbols, OPTIONAL
-     OUT CONST MACH_NLIST_X   **ExternalSymbols, OPTIONAL
-     OUT UINT32               *NumExternalSymbols, OPTIONAL
-     OUT CONST MACH_NLIST_X   **UndefinedSymbols, OPTIONAL
-     OUT UINT32               *NumUndefinedSymbols OPTIONAL
+  IN OUT OC_MACHO_CONTEXT       *Context,
+     OUT CONST   MACH_NLIST_X   **SymbolTable,
+     OUT CONST   CHAR8          **StringTable        OPTIONAL,
+     OUT CONST   MACH_NLIST_X   **LocalSymbols       OPTIONAL,
+     OUT UINT32                 *NumLocalSymbols     OPTIONAL,
+     OUT CONST   MACH_NLIST_X   **ExternalSymbols    OPTIONAL,
+     OUT UINT32                 *NumExternalSymbols  OPTIONAL,
+     OUT CONST   MACH_NLIST_X   **UndefinedSymbols   OPTIONAL,
+     OUT UINT32                 *NumUndefinedSymbols OPTIONAL
   )
 {
   UINT32              Index;

@@ -115,7 +115,7 @@ endif
 # Search Paths.
 #
 CFLAGS += -I$(OC_USER)/User/Include
-CFLAGS += -I$(OC_USER)/Include/Acidanthera -I$(OC_USER)/Include/Apple -I$(OC_USER)/Include/Apple/$(UDK_ARCH) -I$(OC_USER)/Include/Generic -I$(OC_USER)/Include/Intel -I$(OC_USER)/Include/Microsoft
+CFLAGS += -I$(OC_USER)/Include/Acidanthera -I$(OC_USER)/Include/Apple -I$(OC_USER)/Include/Apple/$(UDK_ARCH) -I$(OC_USER)/Include/Generic -I$(OC_USER)/Include/Intel -I$(OC_USER)/Include/Microsoft -I$(OC_USER)/Include/Nvidia
 
 #
 # Skip including UDK when suggesting STANDALONE mode.
@@ -172,11 +172,11 @@ ifneq ($(STANDALONE),1)
 	#
 	# OcCpuLib targets.
 	#
-	OBJS    += FrequencyDetect.o AppleCpuSupport.o OcCpuLib.o
+	OBJS    += FrequencyDetect.o AppleCpuSupport.o OcCpuLib.o MeasureTicks.o
 	#
 	# OcMiscLib targets.
 	#
-	OBJS    += Math.o ProtocolSupport.o DataPatcher.o
+	OBJS    += Math.o ProtocolSupport.o DataPatcher.o PlatformInfo.o
 	#
 	# OcAppleKernelLib targets.
 	#
@@ -208,6 +208,7 @@ ifneq ($(STANDALONE),1)
 				$(OC_USER)/Library/OcMachoLib:$\
 				$(OC_USER)/Library/OcAppleKeysLib:$\
 				$(OC_USER)/Library/OcCpuLib:$\
+				$(OC_USER)/Library/OcCpuLib/Ia32:$\
 				$(OC_USER)/Library/OcMiscLib:$\
 				$(OC_USER)/Library/OcAppleKernelLib
 endif
@@ -216,7 +217,7 @@ endif
 # Miscellaneous implementations that do not depend on UDK.
 #
 VPATH   += $(OC_USER)/User/Library:$
-OBJS    += UserFile.o
+OBJS    += UserFile.o UserPseudoRandom.o
 
 #
 # Directory where objects will be produced.

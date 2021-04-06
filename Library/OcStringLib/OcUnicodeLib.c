@@ -230,7 +230,7 @@ UnicodeGetParentDirectory (
   //
   // Drop trailing slash when getting a directory.
   //
-  if (String[Length - 1] == '\\' && String[Length - 1] == '/') {
+  if (String[Length - 1] == '\\' || String[Length - 1] == '/') {
     --Length;
     //
     // Paths with just one slash have no root directory (e.g. \\/).
@@ -404,4 +404,18 @@ HasValidGuidStringPrefix (
   }
 
   return TRUE;
+}
+
+INTN
+MixedStrCmp (
+  IN CONST CHAR16  *FirstString,
+  IN CONST CHAR8   *SecondString
+  )
+{
+  while (*FirstString != '\0' && *FirstString == *SecondString) {
+    ++FirstString;
+    ++SecondString;
+  }
+
+  return *FirstString - *SecondString;
 }

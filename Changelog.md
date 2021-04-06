@@ -1,7 +1,89 @@
 OpenCore Changelog
 ==================
+#### v0.6.8
+- Switched to VS2019 toolchain for Windows builds
+- Reduced legacy boot install interaction effort
+- Increased OpenCanopy rendering performance
+- Added OpenCanopy Shut Down and Restart buttons
+- Reduced OpenCanopy mouse pointer input lag
+- Fixed that cursor bounds could be different from OpenCanopy's
+- Improved builtin picker rendering performance
+- Added Memory Type decoding for SMBIOS in `Automatic` mode
+- Properly support setting custom entries as default boot options
+- Fixed creating log file when root file system is not writable
+- Fixed `DisableSingleUser` not being enabled in certain cases
+- Added `ForceBooterSignature` quirk for Mac EFI firmware
+- Fixed OpenCanopy sometimes cutting off shown boot entries
+- Further improved CPU frequency calculation on legacy CPUs
+- Fixed SMBIOS SMC version encoding sequence
+- Added TSC frequency reading from Apple Platform Info
+- Added TSC frequency reading for Apple devices with nForce chipsets
+- Added `Base` and `BaseSkip` lookup for ACPI patches
+- Fixed ACPI table magic corruption during patching
+- Fixed unnatural OpenCanopy and FileVault 2 cursor movement
+- Fixed OpenCanopy interrupt handling causing missed events and lag
+- Improved OpenCanopy double-click detection 
+- Reduced OpenCanopy touch input lag and improved usability
+- Improved keypress responsiveness in OpenCanopy and builtin pickers
+- Improved non-repeating key detection in OpenCanopy and builtin pickers
+- Fixed Escape preventing OpenCanopy fade up until released, on some systems
+- Fixed fast repeat then stall issue with key handling on some PS/2 systems
+- Added accurate Shift+Enter/Shift+Index detection when using PollAppleHotKeys
+- Added 'set default' indicator to builtin picker
+- Replaced VerifyMsrE2 with ControlMsrE2 also allowing unlock on some firmwares
+- Fixed OpenCanopy flicker when refreshing the entry view
+- Added OpenCanopy TAB navigation support
+- Added OpenCanopy graphical password interface
+- Added OpenCanopy pulsing animation to signal timeout
+- Added OpenCanopy 'set default' indicator
+- Fixed OpenCanopy not aborting timeout on pointer click
+- Fixed OpenCanopy intro animation not scaling with UIScale
+- Add OpenCanopy boot entry label scrolling (fixes missing long labels)
+- Added tabbable Shutdown and Restart buttons to builtin picker
+- Fixed in-firmware shutdown for some systems running OpenDuet
+- Added Zero as alias hotkey for Escape, to force show picker if hidden
+- Added =/+ key as alias for CTRL to set default OS
+- Added additional support for configuring correct key repeat behaviour with KeySupport mode
+- Fixed CPU multiplier detection on pre-Nehalem Intel CPUs
+- Fixed incorrect handling of multiple processors and processor cache in SMBIOS
+- Matched default Apple boot picker cursor start position
+- Updated OpenShell `devices` command to support misaligned device names returned by some Apple firmware
+- Added `(dmg)` suffix to DMG boot options in OpenCanopy
+- Added identifiers for Rocket Lake and Tiger Lake CPUs
+- Added PickerAudioAssist 'disk image' indication
+- Fixed PickerAudioAssist indications played twice in rare cases
+- Improved OpenCanopy pointer acceleration
+- Added more precise control on `AppleEvent` protocol properties and features
+- Added dynamic keyboard protocol installation on CrScreenshotDxe
+- Support starting UEFI tools with argument support (e.g. `ControlMsrE2`) without arguments from picker
+- Fixed OpenCanopy font height calculation, may reject previously working fonts and mitigate memory corruption
+- Fixed incorrect identification of Xeon E5XXX/E5-XXXX and Xeon WXXXX/W-XXXX CPUs
+- Added RSDP, RSDT, and XSDT handling to `NormalizeHeaders` ACPI quirk
+
 #### v0.6.7
 - Fixed ocvalidate return code to be non-zero when issues are found
+- Added `OEM` values to `PlatformInfo` in `Automatic` mode
+- Improved CPU frequency calculation on Haswell and earlier
+- Fixed issues when applying certain patches
+- Added `SSN` (and `HW_SSN`) variable support
+- Added onscreen early logging in DEBUG builds for legacy firmware
+- Added workaround for firmware not specifying DeviceHandle at bootstrap
+- Added support for R/O page tables in `SetupVirtualMap` quirk
+- Added OEM preservation for certain Apple SMBIOS tables
+- Fixed switching to graphics mode when entering OpenCanopy
+- Fixed installing Apple FB Info protocol when no GOP exists
+- Fixed abort timeout sound in OpenCanopy on key press
+- Added `GopPassThrough` option to support GOP protocol over UGA
+- Fixed CPU speed rounding for certain Xeon and Core 2 CPUs
+- Removed `KeyMergeThreshold` as it never functioned anyway
+- Added `acdtinfo` utility to lookup certain products
+- Fixed `FSBFrequency` calculation with fractional multiplier
+- Fixed showing core count for some AMD CPUs
+- Added `ResetTrafficClass` to reset TCSEL to T0 on legacy HDA
+- Fixed default boot entry selection without timeout for builtin picker
+- Added ocpasswordgen utility to generate OpenCore password data
+- Added `ActivateHpetSupport` quirk to activate HPET support
+- Fixed `opencore-version` reporting the incorrect version in rare cases
 
 #### v0.6.6
 - Added keyboard and pointer entry scroll support in OpenCanopy
@@ -64,11 +146,11 @@ OpenCore Changelog
 - Fixed CPU frequency calculation on AMD 19h family
 - Updated recovery_urls
 - Fixed `DisableSingleUser` quirk when Apple Secure Boot is enabled
-- Added `BootstrapShort` to workaround buggy Insyde firmwares
+- Added `BootstrapShort` to workaround buggy Insyde firmware
 - Changed `Bootstrap(Short)` to choose dynamic entry (requires NVRAM reset)
 - Avoided `Boot` prefix in `RequestBootVarRouting` to workaround AMI issues
 - Added bootloader patch support in `Booter` `Patch` section
-- Fixed startup hang on firmwares allowong reentrance for timer functions
+- Fixed startup hang on firmware that permit timer function re-entrance
 - Made pointer control optional for OpenCanopy via `PickerAttributes`
 - Added support for `StartupMute` variable in `PlayChime`
 - Added support for per-volume icons for APFS on Preboot
